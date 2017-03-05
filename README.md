@@ -22,11 +22,11 @@ Java 8已经发行两年多，但很多人仍然在使用JDK7。对企业来说�
 
 1. [Labmda and Anonymous Classes(I)](./1-Labmda and Anonymous Classes(I).md)，展示如何使用Lambda表达式替代匿名内部类
 2. [Labmda and Anonymous Classes(II)](./2-Labmda and Anonymous Classes(II).md)，Lambda表达式的实现原理
-3. Lambda and Stream，展示Lambda表达式如何跟Stream配合使用
-4. Functional interfaces，展示函数接口的作用，和常见函数接口
-4. Stream API的使用，详细讲解Stream API的用法
-5. Stream API的实现原理
-6. （有待扩充）
+3. [Lambda and Collections](./3-Labmda and Collections.md)，学习Java集合框架（*Java Collections Framework*）新加入的方法
+4. Lambda and Stream，展示Stream API的用法
+5. Functional interfaces，展示函数接口的作用，和常见函数接口
+7. Stream API的实现原理
+8. （有待扩充）
 
 
 
