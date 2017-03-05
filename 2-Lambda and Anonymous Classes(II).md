@@ -1,4 +1,4 @@
-# Labmda and Anonymous Classes(II)
+# Lambda and Anonymous Classes(II)
 
 # 前言
 

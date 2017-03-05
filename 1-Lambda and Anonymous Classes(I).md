@@ -1,8 +1,8 @@
-# Labmda and Anonymous Classes(I)
+# Lambda and Anonymous Classes(I)
 
 # 前言
 
-Java *Labmda表达式*的一个重要用法是简化某些*匿名内部类*（`Anonymous Classes`）的写法。实际上Lambda表达式并不仅仅是匿名内部类的语法糖，JVM内部是通过*invokedynamic*指令来实现Lambda表达式的。具体原理放到下一篇。本篇我们首先感受一下使用Lambda表达式带来的便利之处。
+Java *Lambda表达式*的一个重要用法是简化某些*匿名内部类*（`Anonymous Classes`）的写法。实际上Lambda表达式并不仅仅是匿名内部类的语法糖，JVM内部是通过*invokedynamic*指令来实现Lambda表达式的。具体原理放到下一篇。本篇我们首先感受一下使用Lambda表达式带来的便利之处。
 
 # 取代某些匿名内部类
 
