@@ -1,5 +1,9 @@
 # Lambda and Collections
 
+[TOC]
+
+## 前言
+
 我们先从最熟悉的*Java集合框架(Java Collections Framework, JCF)*开始说起。
 
 为引入Lambda表达式，Java8新增了`java.util.funcion`包，里面包含常用的**函数接口**，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。
@@ -68,7 +72,8 @@ list.forEach( str -> {
 该方法签名为`boolean removeIf(Predicate<? super E> filter)`，作用是**删除容器中所有满足`filter`指定条件的元素**，其中`Predicate`是一个函数接口，里面只有一个待实现方法`boolean test(T t)`，同样的这个方法的名字根本不重要，因为用的时候不需要书写这个名字。
 
 需求：*假设有一个字符串列表，需要删除其中所有长度大于3的字符串。*
-我们知道如果需要在迭代过程冲对容器进行删除操作，必须使用迭代器，否则会抛出`ConcurrentModificationException`，所以上述任务传统的写法是：
+
+我们知道如果需要在迭代过程冲对容器进行删除操作必须使用迭代器，否则会抛出`ConcurrentModificationException`，所以上述任务传统的写法是：
 
 ```Java
 // 使用迭代器删除列表元素
@@ -106,7 +111,7 @@ list.removeIf(str -> str.length()>3); // 删除长度大于3的元素
 
 需求：*假设有一个字符串列表，将其中所有长度大于3的元素转换成大写，其余元素不变。*
 
-使用传统方式似乎没有优雅的办法：
+Java7及之前似乎没有优雅的办法：
 
 ```Java
 // 使用下标实现元素替换
@@ -131,7 +136,7 @@ list.replaceAll(new UnaryOperator<String>(){
     }
 });
 ```
-上述代码调用`replaceAll()`方法，并使用匿名内部类实现`UnaryOperator`接口。当然我们都知道可以用更为简洁的Lambda表达式实现：
+上述代码调用`replaceAll()`方法，并使用匿名内部类实现`UnaryOperator`接口。我们知道可以用更为简洁的Lambda表达式实现：
 ```Java
 // 使用Lambda表达式实现
 ArrayList<String> list = new ArrayList<>(Arrays.asList("I", "love", "you", "too"));
@@ -173,7 +178,7 @@ list.sort((str1, str2) -> str1.length()-str2.length());
 方法签名为`Spliterator<E> spliterator()`，该方法返回容器的**可拆分迭代器**。从名字来看该方法跟`iterator()`方法有点像，我们知道`Iterator`是用来迭代容器的，`Spliterator`也有类似作用，但二者有如下不同：
 
 1. `Spliterator`既可以像`Iterator`那样逐个迭代，也可以批量迭代。批量迭代可以降低迭代的开销。
-2. `Spliterator`是可拆分的，一个`Spliterator`可以通过调用`Spliterator<T> trySplit()`方法来尝试分成两个。一个是`this`，另一个是新返回的那个，并且这两个迭代器代表的元素没有重叠。
+2. `Spliterator`是可拆分的，一个`Spliterator`可以通过调用`Spliterator<T> trySplit()`方法来尝试分成两个。一个是`this`，另一个是新返回的那个，这两个迭代器代表的元素没有重叠。
 
 可通过（多次）调用`Spliterator.trySplit()`方法来分解负载，以便多线程处理。
 
@@ -217,7 +222,7 @@ map.forEach(new BiConsumer<Integer, String>(){
     }
 });
 ```
-上述代码调用`forEach()`方法，并使用匿名内部类实现`BiConsumer`接口。当然，我们知道实际场景中没有人会使用匿名内部类的写法，因为有Lambda表达式：
+上述代码调用`forEach()`方法，并使用匿名内部类实现`BiConsumer`接口。当然，实际场景中没人使用匿名内部类写法，因为有Lambda表达式：
 
 ```Java
 // 使用forEach()结合Lambda表达式迭代Map
@@ -287,7 +292,7 @@ for(Map.Entry<Integer, String> entry : map.entrySet()){
 使用`replaceAll()`方法结合匿名内部类，实现如下：
 
 ```Java
-// 使用`replaceAll()`结合匿名内部类实现
+// 使用replaceAll()结合匿名内部类实现
 HashMap<Integer, String> map = new HashMap<>();
 map.put(1, "one");
 map.put(2, "two");
@@ -302,7 +307,7 @@ map.replaceAll(new BiFunction<Integer, String, String>(){
 上述代码调用`replaceAll()`方法，并使用匿名内部类实现`BiFunction`接口。更进一步的，使用Lambda表达式实现如下：
 
 ```Java
-// 使用`replaceAll()`结合Lambda表达式实现
+// 使用replaceAll()结合Lambda表达式实现
 HashMap<Integer, String> map = new HashMap<>();
 map.put(1, "one");
 map.put(2, "two");
