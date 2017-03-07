@@ -189,7 +189,7 @@ list.sort((str1, str2) -> str1.length()-str2.length());
 ## Map中的新方法
 相比`Collection`，`Map`中加入了更多的方法，我们以`HashMap`为例来逐一探秘。了解[Java7`HashMap`实现原理](https://github.com/CarpenterLee/JCFInternals/blob/master/markdown/6-HashSet%20and%20HashMap.md)，将有助于理解下文。
 
-### forEach
+### forEach()
 
 该方法签名为`void forEach(BiConsumer<? super K,? super V> action)`，作用是**对`Map`中的每个映射执行`action`指定的操作**，其中`BiConsumer`是一个函数接口，里面有一个待实现方法`void accept(T t, U u)`。`BinConsumer`接口名字和`accept()`方法名字都不重要，请不要记忆他们。
 
