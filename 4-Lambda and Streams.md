@@ -10,13 +10,15 @@
 - 调用`Collection.stream()`或者`Collection.parallelStream()`方法
 - 调用`Arrays.stream(T[] array)`方法
 
-常见的*stream*接口继承关系下如：
+常见的*stream*接口继承关系如图：
 
-<img src="./Figures/Java_stream_Interfaces.png"  width="400px" alt="Java_stream_Interfaces"/>
+<img src="./Figures/Java_stream_Interfaces.png"  width="500px" align="left" alt="Java_stream_Interfaces"/>
 
-上图中4种*stream*接口继承自`BaseStream`，其中`IntStream, LongStream, DoubleStream`对应三种基本类型（`int, long, double`，注意不是包装类型），*stream*对应所有剩余类型的*stream*视图。为不同数据类型设置不同*stream*接口，可以1.提高性能，2.增加特定接口函数。
+图中4种*stream*接口继承自`BaseStream`，其中`IntStream, LongStream, DoubleStream`对应三种基本类型（`int, long, double`，注意不是包装类型），*stream*对应所有剩余类型的*stream*视图。为不同数据类型设置不同*stream*接口，可以1.提高性能，2.增加特定接口函数。
 
-<img src="./Figures/WRONG_Java_stream_Interfaces.png"  width="400px" alt="WRONG_Java_stream_Interfaces"/>
+<br>
+
+<img src="./Figures/WRONG_Java_stream_Interfaces.png"  width="400px" align="right" alt="WRONG_Java_stream_Interfaces"/>
 
 你可能会奇怪为什么不把`IntStream`等设计成`Stream`的子接口？毕竟这接口中的方法名大部分是一样的。答案是这些方法的名字虽然相同，但是返回类型不同，如果设计成父子接口关系，这些方法将不能共存，因为Java不允许只有返回类型不同的方法重载。
 
@@ -59,16 +61,16 @@ stream.forEach(str -> System.out.println(str));
 由于`forEach()`是结束方法，上述代码会立即执行，输出所有字符串。
 
 ### filter()
+<img src="./Figures/Stream.filter.png"  width="300px" align="right" alt="Stream filter"/>
 
 函数原型为`Stream<T> filter(Predicate<? super T> predicate)`，作用是返回一个只包含满足`predicate`条件元素的`Stream`。
 
 ```Java
-// 保留长度>3的字符串
+// 保留长度等于3的字符串
 Stream<String> stream= Stream.of("I", "love", "you", "too");
 stream.filter(str -> str.length()==3)
     .forEach(str -> System.out.println(str));
 ```
-<img src="./Figures/Stream.filter.png"  width="300px" alt="Stream filter"/>
 
 上述代码将输出为长度等于3的字符串`you`和`too`。注意，由于`filter()`是个中间操作，如果只调用`filter()`不会有实际计算，因此也不会输出任何信息。
 
