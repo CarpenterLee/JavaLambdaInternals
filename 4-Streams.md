@@ -1,6 +1,6 @@
 # Lambda and Streams
 
-你可能还没意识到Java对Lambda表达式的重要程度，看看Java 8加入函数式编程扩充多少类就清楚了。Java 8之所以费这么大功夫引入函数式编程，原因有二：
+你可能还没意识到Java对函数式编程的重视程度，看看Java 8加入函数式编程扩充多少类就清楚了。Java 8之所以费这么大功夫引入函数式编程，原因有二：
 
 1. __代码简洁__，函数式编程写出的代码简洁且意图明确，使用*stream*接口让你从此告别*for*循环。
 2. __多核友好__，Java函数式编程使得编写并行程序从未如此简单，你需要的全部就是调用一下`parallel()`方法。
@@ -61,7 +61,7 @@ stream.forEach(str -> System.out.println(str));
 由于`forEach()`是结束方法，上述代码会立即执行，输出所有字符串。
 
 ### filter()
-<img src="./Figures/Stream.filter.png"  width="300px" align="right" alt="Stream filter"/>
+<img src="./Figures/Stream.filter.png"  width="250px" align="right" hspace="10px" alt="Stream filter"/>
 
 函数原型为`Stream<T> filter(Predicate<? super T> predicate)`，作用是返回一个只包含满足`predicate`条件元素的`Stream`。
 
@@ -75,6 +75,8 @@ stream.filter(str -> str.length()==3)
 上述代码将输出为长度等于3的字符串`you`和`too`。注意，由于`filter()`是个中间操作，如果只调用`filter()`不会有实际计算，因此也不会输出任何信息。
 
 ### distinct()
+
+<img src="./Figures/Stream.distinct.png"  width="200px" align="left" hspace="10px" alt="Stream distinct"/>
 
 函数原型为`Stream<T> distinct()`，作用是返回一个去除重复元素之后的`Stream`。
 
@@ -100,18 +102,22 @@ stream.sorted((str1, str2) -> str1.length()-str2.length())
 
 ### map()
 
-函数原型为`<R> Stream<R> map(Function<? super T,? extends R> mapper)`，作用是返回一个包含对当前*stream*执行*mapper*指定的方法之后的元素组成的`Stream`。
+<img src="./Figures/Stream.map.png"  width="250px" align="right" hspace="10px" alt="Stream map"/>
+
+函数原型为`<R> Stream<R> map(Function<? super T,? extends R> mapper)`，作用是返回一个对当前所有元素执行执行`mapper`之后的结果组成的`Stream`。直观的说，就是对每个元素按照某种操作进行转换，转换前后`Stream`中元素的个数不会改变，但元素的类型取决于转换之后的类型。
 
 ```Java
 Stream<String> stream　= Stream.of("I", "love", "you", "too");
 stream.map(str -> str.toUpperCase())
     .forEach(str -> System.out.println(str));
 ```
-上述代码将输出源字符串的大写形式。
+上述代码将输出原字符串的大写形式。
 
 ### flatMap()
 
-函数原型为`<R> Stream<R> flatMap(Function<? super T,? extends Stream<? extends R>> mapper)`，作用是对每个元素执行`mapper`指定的操作，并用所有`mapper`返回的`Stream`中的元素组成一个新的`Stream`作为最终分会结果。说起来太拗口，通俗的讲`flatMap()`的作用就相当于把原*strem*中的所有元素都"压平"之后组成的`Stream`。
+<img src="./Figures/Stream.flatMap.png"  width="300px" align="left" hspace="10px" alt="Stream flatMap"/>
+
+函数原型为`<R> Stream<R> flatMap(Function<? super T,? extends Stream<? extends R>> mapper)`，作用是对每个元素执行`mapper`指定的操作，并用所有`mapper`返回的`Stream`中的元素组成一个新的`Stream`作为最终返回结果。说起来太拗口，通俗的讲`flatMap()`的作用就相当于把原*stream*中的所有元素都"摊平"之后组成的`Stream`，转换前后元素的个数和类型都可能会改变。
 
 ```Java
 Stream<List<Integer>> stream = Stream.of(Arrays.asList(1,2), Arrays.asList(3, 4, 5));
@@ -119,7 +125,7 @@ stream.flatMap(list -> list.stream())
     .forEach(i -> System.out.println(i));
 ```
 
-上述代码中，原来的`stream`中有两个元素，分别是两个`List<Integer>`，执行`flatMap()`之后，将每个`List`都“压扁”成了一个个的数字，所以会新产生一个由5个数字组成的`Stream`。所以最终将输出1~5这5个数字。
+上述代码中，原来的`stream`中有两个元素，分别是两个`List<Integer>`，执行`flatMap()`之后，将每个`List`都“摊平”成了一个个的数字，所以会新产生一个由5个数字组成的`Stream`。所以最终将输出1~5这5个数字。
 
 
 
