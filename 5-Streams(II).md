@@ -28,7 +28,7 @@ System.out.println(longest.get());
 
 上述代码会选出最长的单词*love*，其中*Optional*是（一个）值的容器，使用它可以避免*null*值的麻烦。当然可以使用`Stream.max(Comparator<? super T> comparator)`方法来达到同等效果，但`reduce()`自有其存在的理由。
 
-<img src="./Figures/Stream.reduce_parameter.png"  width="300px" align="right" alt="Stream.reduce_parameter"/>
+<img src="./Figures/Stream.reduce_parameter.png"  width="400px" align="right" alt="Stream.reduce_parameter"/>
 
 需求：*求出一组单词的长度之和*。这是个“求和”操作，操作对象输入类型是*String*，而结果类型是*Integer*。
 
@@ -45,7 +45,7 @@ System.out.println(lengthSum);
 
 `reduce()`擅长的是生成一个值，如果想要从*Stream*生成一个集合或者*Map*等复杂的对象该怎么办呢？终极武器`collect()`横空出世！
 
-## 终极武器collect()
+## >>> 终极武器collect() <<<
 
 不夸张的讲，如果你发现某个功能在*Stream*接口中没找到，十有八九可以通过`collect()`方法实现。`collect()`是*Stream*接口方法中最灵活的一个，学会它才算真正入门Java函数式编程。先看几个热身的小例子：
 
@@ -67,8 +67,8 @@ List<String> list = stream.collect(Collectors.toList()); // (1)
 
 *Function*是一个接口，那么`Function.identity()`是什么意思呢？这要从两方面解释：
 
-> 1. Java 8允许在接口中加入具体方法。接口中的具体方法有两种，*default*方法和*static*方法，`identity()`就是*Function*接口的一个静态方法。
-> 2. `Function.identity()`返回一个输出跟输入一样的Lambda表达式对象，等价于形如`t -> t`形式的Lambda表达式。
+1. Java 8允许在接口中加入具体方法。接口中的具体方法有两种，*default*方法和*static*方法，`identity()`就是*Function*接口的一个静态方法。
+2. `Function.identity()`返回一个输出跟输入一样的Lambda表达式对象，等价于形如`t -> t`形式的Lambda表达式。
 
 上面的解释是不是让你疑问更多？不要问我为什么接口中可以有具体方法，也不要告诉我你觉得`t -> t`比`identity()`方法更直观。我会告诉你接口中的*default*方法是一个无奈之举，在Java 7及之前要想在定义好的接口中加入新的抽象方法是很困难甚至不可能的，因为所有实现了该接口的类都要重新实现。试想在*Collection*接口中加入一个`stream()`抽象方法会怎样？*default*方法就是用来解决这个尴尬问题的，直接在接口中实现新加入的方法。既然已经引入了*default*方法，为何不再加入*static*方法来避免专门的工具类呢！
 
@@ -116,7 +116,7 @@ System.out.println(list);
 
 ```Java
 // 将Stream转换成List或Set
-Stream<String> stream = Stream.of("I", "love", "you", "too", "too");
+Stream<String> stream = Stream.of("I", "love", "you", "too");
 List<String> list = stream.collect(Collectors.toList()); // (1)
 Set<String> set = stream.collect(Collectors.toSet()); // (2)
 ```
@@ -124,7 +124,7 @@ Set<String> set = stream.collect(Collectors.toSet()); // (2)
 上述代码能够满足大部分需求，但由于返回结果是接口类型，我们并不知道类库实际选择的容器类型是什么，有时候我们可能会想要人为指定容器的实际类型，这个需求可通过`Collectors.toCollection(Supplier<C> collectionFactory)`方法完成。
 
 ```Java
-// 手动指定规约结果的类型
+// 使用toCollection()指定规约容器的类型
 ArrayList<String> arrayList = stream.collect(Collectors.toCollection(ArrayList::new));// (3)
 HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));// (4)
 ```
@@ -133,17 +133,81 @@ HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));
 
 ## 使用collect()生成Map
 
-前面已经说过*Stream*背后依赖于某种数据源，数据源可以是数组、容器等，但不能是*Map*。反过来从*Stream*生成*Map*是可以的，但我们要想清楚*Map*的*key*和*value*分别代表什么，其实根本原因是我们要想清楚要干什么。
+前面已经说过*Stream*背后依赖于某种数据源，数据源可以是数组、容器等，但不能是*Map*。反过来从*Stream*生成*Map*是可以的，但我们要想清楚*Map*的*key*和*value*分别代表什么，根本原因是我们要想清楚要干什么。通常在三种情况下`collect()`的结果会是*Map*：
 
+1. 使用`Collectors.toMap()`生成的收集器，用户需要指定如何生成*Map*的*key*和*value*。
+2. 使用`Collectors.partitioningBy()`生成的收集器，对元素进行二分区操作时用到。
+3. 使用`Collectors.groupingBy()`生成的收集器，对元素做*group*操作时用到。
 
+情况1：使用`toMap()`生成的收集器，这种情况是最直接的，前面例子中已提到，这是和`Collectors.toCollection()`并列的方法。如下代码展示将学生列表转换成由<学生，GPA>组成的*Map*。非常直观，无需多言。
+
+```Java
+// 使用toMap()统计学生GPA
+Map<Student, Double> studentToGPA =
+     students.stream().collect(Collectors.toMap(Functions.identity(),// 如何生成key
+                                     student -> computeGPA(student)));// 如何生成value
+```
+
+情况2：使用`partitioningBy()`生成的收集器，这种情况适用于将`Stream`中的元素依据某个二值逻辑（满足条件，或不满足）分成互补相交的两部分，比如男女性别、成绩及格与否等。下列代码展示将学生分成成绩及格或不及格的两部分。
+
+```Java
+// Partition students into passing and failing
+Map<Boolean, List<Student>> passingFailing = students.stream()
+         .collect(Collectors.partitioningBy(s -> s.getGrade() >= PASS_THRESHOLD));
+```
+
+情况3：使用`groupingBy()`生成的收集器，这是比较灵活的一种情况。跟SQL中的*group by*语句类似，这里的*groupingBy()*也是按照某个属性对数据进行分组，属性相同的元素会被对应到*Map*的同一个*key*上。下列代码展示将员工按照部门进行分组：
+
+```Java
+// Group employees by department
+Map<Department, List<Employee>> byDept = employees.stream()
+            .collect(Collectors.groupingBy(Employee::getDepartment));
+```
+
+以上只是分组的最基本用法，有些时候仅仅分组是不够的。在SQL中使用*group by*是为了协助其他查询，比如*1. 先将员工按照部门分组，2. 然后统计每个部门员工的人数*。Java类库设计者也考虑到了这种情况，增强版的`groupingBy()`能够满足这种需求。增强版的`groupingBy()`允许我们对元素分组之后再执行某种运算，比如求和、计数、平均值、类型转换等。这种先将元素分组的收集器叫做**上游收集器**，之后执行其他运算的收集器叫做**下游收集器**(*downstream Collector*)。
+
+```Java
+// 使用下游收集器统计每个部门的人数
+Map<Department, Integer> totalByDept = employees.stream()
+                    .collect(Collectors.groupingBy(Employee::getDepartment,
+                                                   Collectors.counting()));// 下游收集器
+```
+
+上面代码的逻辑是不是越看越像SQL？高度非结构化。还有更狠的，下游收集器还可以包含更下游的收集器，这绝不是为了炫技而增加的把戏，而是实际场景需要。考虑将员工按照部门分组的场景，如果*我们想得到每个员工的名字（字符串），而不是一个个*Employee*对象*，可通过如下方式做到：
+
+```Java
+// 按照部门对员工分布组，并只保留员工的名字
+Map<Department, List<String>> byDept = employees.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment,
+                        Collectors.mapping(Employee::getName,// 下游收集器
+                                Collectors.toList())));// 更下游的收集器
+```
+
+如果看到这里你还没有对Java函数式编程失去信心，恭喜你，你已经顺利成为Java函数式编程大师了。
 
 ## 使用collect()做字符串join
 
+这个肯定是大家喜闻乐见的功能，字符串拼接时使用`Collectors.joining()`生成的收集器，从此告别*for*循环。`Collectors.joining()`方法有三种重写形式，分别对应三种不同的拼接方式。无需多言，代码过目难忘。
+
+```Java
+// 使用Collectors.joining()拼接字符串
+Stream<String> stream = Stream.of("I", "love", "you");
+//String joined = stream.collect(Collectors.joining());// "Iloveyou"
+//String joined = stream.collect(Collectors.joining(","));// "I,love,you"
+String joined = stream.collect(Collectors.joining(",", "{", "}"));// "{I,love,you}"
+```
+
+## collect()还可以做更多
+
+除了可以使用*Collectors*工具类已经封装好的收集器，我们还可以自定义收集器，或者直接调用`collect(Supplier<R> supplier, BiConsumer<R,? super T> accumulator, BiConsumer<R,R> combiner)`方法，**收集任何形式你想要的信息**。不过*Collectors*工具类应该能满足我们的绝大部分需求，手动实现之间请先看看文档。
 
 # 参考文献
 
-https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
-
+1. https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html#package.description
+2. https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
+3. https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html
+4. https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html
+5. https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html
 
 
 
