@@ -17,7 +17,6 @@
 虽然函数定义越来越长，但语义不曾改变，多的参数只是为了指明初始值（参数*identity*），或者是指定并行执行时多个部分结果的合并方式（参数*combiner*）。`reduce()`最常用的场景就是从一堆值中生成一个值。用这么复杂的函数去求一个最大或最小值，你是不是觉得设计者有病。其实不然，因为“大”和“小”或者“求和"有时会有不同的语义。
 
 需求：*从一组单词中找出最长的单词*。这里“大”的含义就是“长”。
-
 ```Java
 // 找出最长的单词
 Stream<String> stream = Stream.of("I", "love", "you", "too");
@@ -25,13 +24,11 @@ Optional<String> longest = stream.reduce((s1, s2) -> s1.length()>=s2.length() ? 
 //Optional<String> longest = stream.max((s1, s2) -> s1.length()-s2.length());
 System.out.println(longest.get());
 ```
-
 上述代码会选出最长的单词*love*，其中*Optional*是（一个）值的容器，使用它可以避免*null*值的麻烦。当然可以使用`Stream.max(Comparator<? super T> comparator)`方法来达到同等效果，但`reduce()`自有其存在的理由。
 
 <img src="./Figures/Stream.reduce_parameter.png"  width="400px" align="right" alt="Stream.reduce_parameter"/>
 
 需求：*求出一组单词的长度之和*。这是个“求和”操作，操作对象输入类型是*String*，而结果类型是*Integer*。
-
 ```Java
 // 求单词长度之和
 Stream<String> stream = Stream.of("I", "love", "you", "too");
@@ -48,7 +45,6 @@ System.out.println(lengthSum);
 ## >>> 终极武器collect() <<<
 
 不夸张的讲，如果你发现某个功能在*Stream*接口中没找到，十有八九可以通过`collect()`方法实现。`collect()`是*Stream*接口方法中最灵活的一个，学会它才算真正入门Java函数式编程。先看几个热身的小例子：
-
 ```Java
 // 将Stream转换成容器或Map
 Stream<String> stream = Stream.of("I", "love", "you", "too");
@@ -56,7 +52,6 @@ List<String> list = stream.collect(Collectors.toList()); // (1)
 // Set<String> set = stream.collect(Collectors.toSet()); // (2)
 // Map<String, Integer> map = stream.collect(Collectors.toMap(Function.identity(), String::length)); // (3)
 ```
-
 上述代码分别列举了如何将*Stream*转换成*List*、*Set*和*Map*。虽然代码语义很明确，可是我们仍然会有几个疑问：
 
 1. `Function.identity()`是干什么的？
@@ -89,7 +84,7 @@ List<String> list = stream.collect(Collectors.toList()); // (1)
 
 相信前面繁琐的内容已彻底打消了你学习Java函数式编程的热情，不过很遗憾，下面的内容更繁琐。
 
-<img src="./Figures/Stream.collect_parameter.png" width="400px", align="right" alt="Stream.collect_parameter" />
+<img src="./Figures/Stream.collect_parameter.png" width="500px", align="right" alt="Stream.collect_parameter" />
 
 收集器（*Collector*）是为`Stream.collect()`方法量身打造的工具接口（类）。考虑一下将一个*Stream*转换成一个容器（或者*Map*）需要做哪些工作？我们至少需要两样东西：
 
@@ -99,7 +94,6 @@ List<String> list = stream.collect(Collectors.toList()); // (1)
 如果并行的进行规约，还需要告诉*collect()* 3. 多个部分结果如何合并成一个。
 
 结合以上分析，*collect()*方法定义为`<R> R collect(Supplier<R> supplier, BiConsumer<R,? super T> accumulator, BiConsumer<R,R> combiner)`，三个参数依次对应上述三条分析。不过每次调用*collect()*都要传入这三个参数太麻烦，收集器*Collector*就是对这三个参数的简单封装,所以*collect()*的另一定义为`<R,A> R collect(Collector<? super T,A,R> collector)`。*Collectors*工具类可通过静态方法生成各种常用的*Collector*。举例来说，如果要将*Stream*规约成*List*可以通过如下两种方式实现：
-
 ```Java
 //　将Stream规约成List
 Stream<String> stream = Stream.of("I", "love", "you", "too");
@@ -107,28 +101,23 @@ List<String> list = stream.collect(ArrayList::new, ArrayList::add, ArrayList::ad
 //List<String> list = stream.collect(Collectors.toList());// 方式2
 System.out.println(list);
 ```
-
 通常情况下我们不需要手动指定*collect()*的三个参数，而是调用`collect(Collector<? super T,A,R> collector)`方法，并且参数中的*Collector*对象大都是直接通过*Collectors*工具类获得。实际上传入的**收集器的行为决定了`collect()`的行为**。
 
 ## 使用collect()生成Collection
 
 前面已经提到通过`collect()`方法将*Stream*转换成容器的方法，这里再汇总一下。将*Stream*转换成*List*或*Set*是比较常见的操作，所以*Collectors*工具已经为我们提供了对应的收集器，通过如下代码即可完成：
-
 ```Java
 // 将Stream转换成List或Set
 Stream<String> stream = Stream.of("I", "love", "you", "too");
 List<String> list = stream.collect(Collectors.toList()); // (1)
 Set<String> set = stream.collect(Collectors.toSet()); // (2)
 ```
-
 上述代码能够满足大部分需求，但由于返回结果是接口类型，我们并不知道类库实际选择的容器类型是什么，有时候我们可能会想要人为指定容器的实际类型，这个需求可通过`Collectors.toCollection(Supplier<C> collectionFactory)`方法完成。
-
 ```Java
 // 使用toCollection()指定规约容器的类型
 ArrayList<String> arrayList = stream.collect(Collectors.toCollection(ArrayList::new));// (3)
 HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));// (4)
 ```
-
 上述代码(3)处指定规约结果是*ArrayList*，而(4)处指定规约结果为*HashSet*。一切如你所愿。
 
 ## 使用collect()生成Map
@@ -140,41 +129,32 @@ HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));
 3. 使用`Collectors.groupingBy()`生成的收集器，对元素做*group*操作时用到。
 
 情况1：使用`toMap()`生成的收集器，这种情况是最直接的，前面例子中已提到，这是和`Collectors.toCollection()`并列的方法。如下代码展示将学生列表转换成由<学生，GPA>组成的*Map*。非常直观，无需多言。
-
 ```Java
 // 使用toMap()统计学生GPA
 Map<Student, Double> studentToGPA =
      students.stream().collect(Collectors.toMap(Functions.identity(),// 如何生成key
                                      student -> computeGPA(student)));// 如何生成value
 ```
-
 情况2：使用`partitioningBy()`生成的收集器，这种情况适用于将`Stream`中的元素依据某个二值逻辑（满足条件，或不满足）分成互补相交的两部分，比如男女性别、成绩及格与否等。下列代码展示将学生分成成绩及格或不及格的两部分。
-
 ```Java
 // Partition students into passing and failing
 Map<Boolean, List<Student>> passingFailing = students.stream()
          .collect(Collectors.partitioningBy(s -> s.getGrade() >= PASS_THRESHOLD));
 ```
-
 情况3：使用`groupingBy()`生成的收集器，这是比较灵活的一种情况。跟SQL中的*group by*语句类似，这里的*groupingBy()*也是按照某个属性对数据进行分组，属性相同的元素会被对应到*Map*的同一个*key*上。下列代码展示将员工按照部门进行分组：
-
 ```Java
 // Group employees by department
 Map<Department, List<Employee>> byDept = employees.stream()
             .collect(Collectors.groupingBy(Employee::getDepartment));
 ```
-
 以上只是分组的最基本用法，有些时候仅仅分组是不够的。在SQL中使用*group by*是为了协助其他查询，比如*1. 先将员工按照部门分组，2. 然后统计每个部门员工的人数*。Java类库设计者也考虑到了这种情况，增强版的`groupingBy()`能够满足这种需求。增强版的`groupingBy()`允许我们对元素分组之后再执行某种运算，比如求和、计数、平均值、类型转换等。这种先将元素分组的收集器叫做**上游收集器**，之后执行其他运算的收集器叫做**下游收集器**(*downstream Collector*)。
-
 ```Java
 // 使用下游收集器统计每个部门的人数
 Map<Department, Integer> totalByDept = employees.stream()
                     .collect(Collectors.groupingBy(Employee::getDepartment,
                                                    Collectors.counting()));// 下游收集器
 ```
-
 上面代码的逻辑是不是越看越像SQL？高度非结构化。还有更狠的，下游收集器还可以包含更下游的收集器，这绝不是为了炫技而增加的把戏，而是实际场景需要。考虑将员工按照部门分组的场景，如果*我们想得到每个员工的名字（字符串），而不是一个个*Employee*对象*，可通过如下方式做到：
-
 ```Java
 // 按照部门对员工分布组，并只保留员工的名字
 Map<Department, List<String>> byDept = employees.stream()
@@ -182,13 +162,11 @@ Map<Department, List<String>> byDept = employees.stream()
                         Collectors.mapping(Employee::getName,// 下游收集器
                                 Collectors.toList())));// 更下游的收集器
 ```
-
 如果看到这里你还没有对Java函数式编程失去信心，恭喜你，你已经顺利成为Java函数式编程大师了。
 
 ## 使用collect()做字符串join
 
 这个肯定是大家喜闻乐见的功能，字符串拼接时使用`Collectors.joining()`生成的收集器，从此告别*for*循环。`Collectors.joining()`方法有三种重写形式，分别对应三种不同的拼接方式。无需多言，代码过目难忘。
-
 ```Java
 // 使用Collectors.joining()拼接字符串
 Stream<String> stream = Stream.of("I", "love", "you");
@@ -196,7 +174,6 @@ Stream<String> stream = Stream.of("I", "love", "you");
 //String joined = stream.collect(Collectors.joining(","));// "I,love,you"
 String joined = stream.collect(Collectors.joining(",", "{", "}"));// "{I,love,you}"
 ```
-
 ## collect()还可以做更多
 
 除了可以使用*Collectors*工具类已经封装好的收集器，我们还可以自定义收集器，或者直接调用`collect(Supplier<R> supplier, BiConsumer<R,? super T> accumulator, BiConsumer<R,R> combiner)`方法，**收集任何形式你想要的信息**。不过*Collectors*工具类应该能满足我们的绝大部分需求，手动实现之间请先看看文档。
