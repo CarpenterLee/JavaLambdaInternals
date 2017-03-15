@@ -84,7 +84,7 @@ List<String> list = stream.collect(Collectors.toList()); // (1)
 
 相信前面繁琐的内容已彻底打消了你学习Java函数式编程的热情，不过很遗憾，下面的内容更繁琐。
 
-<img src="./Figures/Stream.collect_parameter.png" width="500px", align="right" alt="Stream.collect_parameter" />
+<img src="./Figures/Stream.collect_parameter.png" width="400px", align="right" alt="Stream.collect_parameter" />
 
 收集器（*Collector*）是为`Stream.collect()`方法量身打造的工具接口（类）。考虑一下将一个*Stream*转换成一个容器（或者*Map*）需要做哪些工作？我们至少需要两样东西：
 
