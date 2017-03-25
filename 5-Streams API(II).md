@@ -1,4 +1,4 @@
-# Streams(II)
+# Streams API(II)
 
 上一节介绍了部分*Stream*常见接口方法，理解起来并不困难，但*Stream*的用法不止于此，本节我们将仍然以*Stream*为例，介绍流的规约操作。
 

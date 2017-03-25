@@ -70,17 +70,13 @@ for(String str : strings){
 
 注意这里使用的是*“操作(operation)”*一词，指的是“Stream中间操作”的操作，很多Stream操作会需要一个回调函数（Lambda表达式），因此一个完整的操作是*<数据来源，操作，回调函数>*构成的三元组。Stream中使用Stage的概念来描述一个完整的操作，并用某种实例化后的*PipelineHelper*来代表Stage，将具有先后顺序的各个Stage连到一起，就构成了整个流水线。跟Stream相关类和接口的继承关系如下：
 
-<img src="./Figures/Java_stream_pipeline_classes.png"  width="500px" align="right" alt="Java_stream_pipeline_classes"/>
+<img src="./Figures/Java_stream_pipeline_classes.png"  width="500px" align="right" hspace="10px" alt="Java_stream_pipeline_classes"/>
 
 图中还有*IntPipeline*, *LongPipeline*, *DoublePipeline*没有画出，这三个类专门为三种基本类型（不是包装类型）而定制的，跟*ReferencePipeline*是并列关系。图中*Head*用于表示第一个Stage，即调用调用诸如*Collection.stream()*方法产生的Stage，很显然这个Stage里不包含任何操作；*StatelessOp*和*StatefulOp*分别表示有状态和无状态的Stage，对应与有状态和无状态的中间操作。
 
-<br>
-
 一个可能的流水线示意图如下：
 
-<img src="./Figures/Stream_pipeline_example.png"  width="600px" align="left" alt="Stream_pipeline_example"/>
-
-<br>
+<img src="./Figures/Stream_pipeline_example.png"  width="600px" align="right" alt="Stream_pipeline_example"/>
 
 图中通过*Collection.stream()*方法得到*Head*也就是stage0，紧接着调用一系列的中间操作，不断产生新的Stream。**这些Stream对象以双向链表的形式组织在一起，构成整个流水线，由于每个Stage都记录了前一个Stage和本次的操作以及回调函数，依靠这种结构就能建立起对数据源的所有操作**。这就是Stream记录操作的方式。
 
