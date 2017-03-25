@@ -35,18 +35,16 @@ Stream上的所有操作分为两类：中间操作和结束操作，中间操�
 
 ## 一种直白的实现方式
 
-仍然考虑上述求最长字符串的程序，一种直白的方式是为每一次函数调用都执一次迭代，并将处理中间结果放到某种数据结构中（比如数组，容器等）。具体说来，就是调用*filter()*方法后立即执行，选出所有以*A*开头的字符串并放到一个列表list1中，之后让list1传递给*mapToInt()*方法并立即执行，生成的结果放到list2中，最后遍历list2找出最大的数字作为最终结果。程序的执行流程如下如所示：
+<img src="./Figures/Stream_pipeline_naive.png"  width="500px" align="right" alt="Stream_pipeline_naive"/>
 
-<img src="./Figures/Stream_pipeline_naive.png"  width="500px" align="left" alt="Stream_pipeline_naive"/>
-
-<br>
+仍然考虑上述求最长字符串的程序，一种直白的方式是为每一次函数调用都执一次迭代，并将处理中间结果放到某种数据结构中（比如数组，容器等）。具体说来，就是调用*filter()*方法后立即执行，选出所有以*A*开头的字符串并放到一个列表list1中，之后让list1传递给*mapToInt()*方法并立即执行，生成的结果放到list2中，最后遍历list2找出最大的数字作为最终结果。程序的执行流程如如所示：
 
 这样做实现起来非常简单直观，但有两个明显的弊端：
 
 1. 迭代次数多。迭代次数跟函数调用的次数相等。
 2. 频繁产生中间结果。每次函数调用都产生一次中间结果，存储开销无法接受。
 
-这种弊端使得效率地下，根本无法接受。如果不使用Stream API我们都知道上述代码该如何在一次迭代中完成，大致是如下形式：
+这种弊端使得效率底下，根本无法接受。如果不使用Stream API我们都知道上述代码该如何在一次迭代中完成，大致是如下形式：
 
 ```Java
 int longest = 0;
@@ -72,7 +70,7 @@ for(String str : strings){
 
 注意这里使用的是*“操作(operation)”*一词，指的是“Stream中间操作”的操作，很多Stream操作会需要一个回调函数（Lambda表达式），因此一个完整的操作是*<数据来源，操作，回调函数>*构成的三元组。Stream中使用Stage的概念来描述一个完整的操作，并用某种实例化后的*PipelineHelper*来代表Stage，将具有先后顺序的各个Stage连到一起，就构成了整个流水线。跟Stream相关类和接口的继承关系如下：
 
-<img src="./Figures/Java_stream_pipeline_classes.png"  width="400px" align="left" alt="Java_stream_pipeline_classes"/>
+<img src="./Figures/Java_stream_pipeline_classes.png"  width="500px" align="right" alt="Java_stream_pipeline_classes"/>
 
 图中还有*IntPipeline*, *LongPipeline*, *DoublePipeline*没有画出，这三个类专门为三种基本类型（不是包装类型）而定制的，跟*ReferencePipeline*是并列关系。图中*Head*用于表示第一个Stage，即调用调用诸如*Collection.stream()*方法产生的Stage，很显然这个Stage里不包含任何操作；*StatelessOp*和*StatefulOp*分别表示有状态和无状态的Stage，对应与有状态和无状态的中间操作。
 
@@ -80,7 +78,7 @@ for(String str : strings){
 
 一个可能的流水线示意图如下：
 
-<img src="./Figures/Stream_pipeline_example.png"  width="500px" align="left" alt="Stream_pipeline_example"/>
+<img src="./Figures/Stream_pipeline_example.png"  width="600px" align="left" alt="Stream_pipeline_example"/>
 
 <br>
 
@@ -96,7 +94,7 @@ for(String str : strings){
 
 有了上面的协议，相邻Stage之间调用就很方便了，每个Stage都会将自己的操作封装到一个Sink里，前一个Stage只需调用后一个Stage的*accept()*方法即可，并不需要知道其内部是如何处理的。当然对于有状态的操作，Sink的*begin()*和*end()*方法也是必须实现的。比如Stream.sorted()是一个有状态的中间操作，其对应的*Sink.begin()*方法可能创建一个乘放结果的容器，而*accept()*方法负责将元素添加到该容器，最后*end()*负责对容器进行排序。对于短路操作，*Sink.cancellationRequested()*也是必须实现的，比如*Stream.findFirst()*是短路操作，只要找到一个元素，*cancellationRequested()*就应该返回*true*，以便调用者尽快结束查找。Sink的四个接口方法常常相互协作，共同完成计算任务。
 
-有了Sink对操作的包装，Stage之间的调用问题就解决了，执行时只需要从流水线的head开始依次调用每个Stage对应的*{Sink.begin(), accept(), cancellationRequested(), end()}*方法就可以了。一种可能的*Sink.accept()*方法流程是这样的：
+有了Sink对操作的包装，Stage之间的调用问题就解决了，执行时只需要从流水线的head开始依次调用每个Stage对应的{Sink.begin(), accept(), cancellationRequested(), end()}方法就可以了。一种可能的*Sink.accept()*方法流程是这样的：
 
 ```Java
 void accept(U u){
