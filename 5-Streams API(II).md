@@ -82,7 +82,7 @@ List<String> list = stream.collect(Collectors.toList()); // (1)
 
 ## 收集器
 
-相信前面繁琐的内容已彻底打消了你学习Java函数式编程的热情，不过很遗憾，下面的内容更繁琐。
+相信前面繁琐的内容已彻底打消了你学习Java函数式编程的热情，不过很遗憾，下面的内容更繁琐。但这不能怪Stream类库，因为要实现的功能本身很复杂。
 
 <img src="./Figures/Stream.collect_parameter.png" width="500px" align="right" alt="Stream.collect_parameter" />
 
