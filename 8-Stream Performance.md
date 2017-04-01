@@ -15,6 +15,8 @@
 1. GC的影响。GC的行为是Java中很不好控制的一块，为增加确定性，我们手动指定使用CMS收集器，并使用10GB固定大小的堆内存。集体到JVM参数就是`-XX:+UseConcMarkSweepGC -Xms10G -Xmx10G`
 2. JIT(Just-In-Time)即时编译技术。即时编译技术会将热点代码在JVM运行的过程中编译成本地代码，测试时我们会先对程序预热，触发对测试函数的即时编译。相关的JVM参数是`-XX:CompileThreshold=10000`。
 
+Stream并行执行时用到`ForkJoinPool.commonPool()`得到的线程池，为控制并行度我们使用Linux的`taskset`命令指定JVM可用的核数。
+
 测试数据由程序随机生成。为防止一次测试带来的抖动，测试4次求出平均时间作为运行时间。
 
 
@@ -25,14 +27,14 @@
 
 测试程序[IntTest](./perf/StreamBenchmark/src/lee/IntTest.java)，测试结果如下图：
 
-<img src="./Figures/perf_Stream_min_int.png"  width="500px" align="center" alt="perf_Stream_min_int"/>
+<img src="./Figures/perf_Stream_min_int.png"  width="600px" align="center" alt="perf_Stream_min_int"/>
 
 图中展示的是for循环外部迭代耗时为基准的时间比值。分析如下：
 
 1. 对于基本类型Stream串行迭代的性能开销明显高于外部迭代开销（两倍）；
 2. Stream并行迭代的性能比串行迭代和外部迭代都好。
 
-并行迭代性能跟跟可利用的核数有关，所有我们专门测试了不同核数下的Stream并行迭代效果：
+并行迭代性能跟可利用的核数有关，所有我们专门测试了不同核数下的Stream并行迭代效果：
 
 <img src="./Figures/perf_Stream_min_int_par.png"  width="500px" align="center" alt="perf_Stream_min_int_par"/>
 
@@ -52,7 +54,7 @@
 
 测试程序[StringTest](./perf/StreamBenchmark/src/lee/StringTest.java)，测试结果如下图：
 
-<img src="./Figures/perf_Stream_min_String.png"  width="500px" align="center" alt="perf_Stream_min_String"/>
+<img src="./Figures/perf_Stream_min_String.png"  width="600px" align="center" alt="perf_Stream_min_String"/>
 
 结果分析如下：
 
@@ -76,9 +78,9 @@
 
 测试内容：给定订单列表，统计每个用户的总交易额。对比使用外部迭代手动实现和Stream API之间的性能。
 
-我们将订单简化为`<userName, price, timeStamp>`构成的元组，并用`Order`对象来表示。测试程序[ReductionTest](./perf/StreamBenchmark/src/lee/ReductionTest.java),测试结果如下图：
+我们将订单简化为`<userName, price, timeStamp>`构成的元组，并用`Order`对象来表示。测试程序[ReductionTest](./perf/StreamBenchmark/src/lee/ReductionTest.java)，测试结果如下图：
 
-<img src="./Figures/perf_Stream_reduction.png"  width="500px" align="center" alt="perf_Stream_reduction"/>
+<img src="./Figures/perf_Stream_reduction.png"  width="600px" align="center" alt="perf_Stream_reduction"/>
 
 分析，对于复杂的归约操作：
 
@@ -103,6 +105,6 @@
 1. 对于简单操作，比如最简单的遍历，Stream串行API性能明显差于显示迭代，但并行的Stream API能够发挥多核特性。
 2. 对于复杂操作，Stream串行API性能可以和手动实现的效果匹敌，在并行执行时Stream API效果远超手动实现。
 
-所以，如果出于性能（而不是代码的简洁）考虑，1. 对于简单操作推荐通过外部迭代手动实现，2. 对于复杂操作，推荐使用Stream API， 3. 在多核情况下，推荐使用并行Stream API来发挥多核优势。
+所以，如果出于性能（而不是代码的简洁）考虑，1. 对于简单操作推荐通过外部迭代手动实现，2. 对于复杂操作，推荐使用Stream API， 3. 在多核情况下，推荐使用并行Stream API来发挥多核优势，4.单核情况下不建议使用并行Stream API。
 
 即使是从性能方面说，尽可能的使用Stream API也另外一个优势，那就是只要Java Stream类库做了升级优化，代码不用做任何修改就能享受到升级带来的好处。
