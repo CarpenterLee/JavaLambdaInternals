@@ -34,7 +34,7 @@ Stream并行执行时用到`ForkJoinPool.commonPool()`得到的线程池，为�
 1. 对于基本类型Stream串行迭代的性能开销明显高于外部迭代开销（两倍）；
 2. Stream并行迭代的性能比串行迭代和外部迭代都好。
 
-并行迭代性能跟可利用的核数有关，所有我们专门测试了不同核数下的Stream并行迭代效果：
+并行迭代性能跟可利用的核数有关，上图中的并行迭代使用了全部12个核，为考察使用核数对性能的影响，我们专门测试了不同核数下的Stream并行迭代效果：
 
 <img src="./Figures/perf_Stream_min_int_par.png"  width="500px" align="center" alt="perf_Stream_min_int_par"/>
 
@@ -105,6 +105,6 @@ Stream并行执行时用到`ForkJoinPool.commonPool()`得到的线程池，为�
 1. 对于简单操作，比如最简单的遍历，Stream串行API性能明显差于显示迭代，但并行的Stream API能够发挥多核特性。
 2. 对于复杂操作，Stream串行API性能可以和手动实现的效果匹敌，在并行执行时Stream API效果远超手动实现。
 
-所以，如果出于性能（而不是代码的简洁）考虑，1. 对于简单操作推荐通过外部迭代手动实现，2. 对于复杂操作，推荐使用Stream API， 3. 在多核情况下，推荐使用并行Stream API来发挥多核优势，4.单核情况下不建议使用并行Stream API。
+所以，如果出于性能考虑，1. 对于简单操作推荐使用外部迭代手动实现，2. 对于复杂操作，推荐使用Stream API， 3. 在多核情况下，推荐使用并行Stream API来发挥多核优势，4.单核情况下不建议使用并行Stream API。
 
-即使是从性能方面说，尽可能的使用Stream API也另外一个优势，那就是只要Java Stream类库做了升级优化，代码不用做任何修改就能享受到升级带来的好处。
+如果出于代码简洁性考虑，使用Stream API能够写出更短的代码。即使是从性能方面说，尽可能的使用Stream API也另外一个优势，那就是只要Java Stream类库做了升级优化，代码不用做任何修改就能享受到升级带来的好处。
