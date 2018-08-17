@@ -132,7 +132,7 @@ HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));
 ```Java
 // 使用toMap()统计学生GPA
 Map<Student, Double> studentToGPA =
-     students.stream().collect(Collectors.toMap(Functions.identity(),// 如何生成key
+     students.stream().collect(Collectors.toMap(Function.identity(),// 如何生成key
                                      student -> computeGPA(student)));// 如何生成value
 ```
 情况2：使用`partitioningBy()`生成的收集器，这种情况适用于将`Stream`中的元素依据某个二值逻辑（满足条件，或不满足）分成互补相交的两部分，比如男女性别、成绩及格与否等。下列代码展示将学生分成成绩及格或不及格的两部分。
