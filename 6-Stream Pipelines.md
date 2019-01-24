@@ -163,7 +163,7 @@ class RefSortingSink<T> extends AbstractRefSortingSink<T> {
 ```
 
 上述代码完美的展现了Sink的四个接口方法是如何协同工作的：
-1. 首先beging()方法告诉Sink参与排序的元素个数，方便确定中间结果容器的的大小；
+1. 首先begin()方法告诉Sink参与排序的元素个数，方便确定中间结果容器的的大小；
 2. 之后通过accept()方法将元素添加到中间结果当中，最终执行时调用者会不断调用该方法，直到遍历所有元素；
 3. 最后end()方法告诉Sink所有元素遍历完毕，启动排序步骤，排序完成后将结果传递给下游的Sink；
 4. 如果下游的Sink是短路操作，将结果传递给下游时不断询问下游cancellationRequested()是否可以结束处理。
