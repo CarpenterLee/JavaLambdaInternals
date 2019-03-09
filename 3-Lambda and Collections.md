@@ -6,7 +6,7 @@
 
 我们先从最熟悉的*Java集合框架(Java Collections Framework, JCF)*开始说起。
 
-为引入Lambda表达式，Java8新增了`java.util.funcion`包，里面包含常用的**函数接口**，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。
+为引入Lambda表达式，Java8新增了`java.util.function`包，里面包含常用的**函数接口**，这是Lambda表达式的基础，Java集合框架也新增部分接口，以便与Lambda表达式对接。
 
 首先回顾一下Java集合框架的接口继承结构：
 
