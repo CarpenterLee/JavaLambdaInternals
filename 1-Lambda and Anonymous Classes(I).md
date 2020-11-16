@@ -107,7 +107,7 @@ public interface ConsumerInterface<T>{
 }
 ```
 
-上面代码中的@FunctionalInterface是可选的，但加上该标注编译器会帮你检查接口是否符合函数接口规范。就像加入@Override标注会检查是否重载了函数一样。
+上面代码中的@FunctionalInterface是可选的，但加上该标注编译器会帮你检查接口是否符合函数接口规范。就像加入@Override标注会检查是否重写了函数一样。
 
 有了上述接口定义，就可以写出类似如下的代码：
 
