@@ -22,7 +22,7 @@ new Thread(new Runnable(){// 接口名
 }).start();
 ```
 
-上述代码给`Tread`类传递了一个匿名的`Runnable`对象，重载`Runnable`接口的`run()`方法来实现相应逻辑。这是JDK7以及之前的常见写法。匿名内部类省去了为类起名字的烦恼，但还是不够简化，在Java 8中可以简化为如下形式：
+上述代码给`Tread`类传递了一个匿名的`Runnable`对象，重写`Runnable`接口的`run()`方法来实现相应逻辑。这是JDK7以及之前的常见写法。匿名内部类省去了为类起名字的烦恼，但还是不够简化，在Java 8中可以简化为如下形式：
 
 ```Java
 // JDK8 Lambda表达式写法
