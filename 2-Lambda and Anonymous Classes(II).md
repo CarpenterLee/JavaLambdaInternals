@@ -20,7 +20,7 @@ public class MainAnonymousClass {
 			public void run(){
 				System.out.println("Anonymous Class Thread run()");
 			}
-		}).start();;
+		}).start();
 	}
 }
 ```
