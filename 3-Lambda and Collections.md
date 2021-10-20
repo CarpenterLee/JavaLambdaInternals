@@ -24,7 +24,7 @@
 
 ## Collection中的新方法
 
-如上所示，接口`Collection`和`List`新加入了一些方法，我们以是`List`的子类`ArrayList`为例来说明。了解[Java7`ArrayList`实现原理](https://github.com/CarpenterLee/JCFInternals/blob/master/markdown/2-ArrayList.md)，将有助于理解下文。
+如上所示，接口`Collection`和`List`新加入了一些方法，我们以`List`的实现类`ArrayList`为例来说明。了解[Java7`ArrayList`实现原理](https://github.com/CarpenterLee/JCFInternals/blob/master/markdown/2-ArrayList.md)，将有助于理解下文。
 
 ### forEach()
 
