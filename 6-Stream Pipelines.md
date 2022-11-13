@@ -156,7 +156,7 @@ public final <R> Stream<R> map(Function<? super P_OUT, ? extends R> mapper) {
     ...
     return new StatelessOp<P_OUT, R>(this, StreamShape.REFERENCE,
                                  StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
-        @Override /*opWripSink()方法返回由回调函数包装而成Sink*/
+        @Override /*opWrapSink()方法返回由回调函数包装而成Sink*/
         Sink<P_OUT> opWrapSink(int flags, Sink<R> downstream) {
             return new Sink.ChainedReference<P_OUT, R>(downstream) {
                 @Override
